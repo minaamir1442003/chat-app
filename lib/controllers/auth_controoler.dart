@@ -124,7 +124,7 @@ class AuthController extends GetxController {
       Get.offAllNamed(AppRoutes.login);
     } catch (e) {
       _error.value = e.toString();
-      Get.snackbar("error", "fiald to delet account");
+      Get.snackbar("Error", "fiald to delet account");
     } finally {
       _isloading.value = false;
     }
