@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1084692815857",
+    "project_id": "chat-frind-178d0",
+    "storage_bucket": "chat-frind-178d0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084692815857:android:1a96e73460a7ba6c8b2e50",
+        "android_client_info": {
+          "package_name": "com.example.chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGNdcD5lNb0EgzYkDZILx_aVdcS7iUkos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
