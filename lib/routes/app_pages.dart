@@ -2,7 +2,8 @@ import 'package:chat/controllers/profile_conroller.dart';
 import 'package:chat/routes/app_routes.dart';
 import 'package:chat/views/auth/forget_password_view.dart';
 import 'package:chat/views/auth/login_view.dart';
-import 'package:chat/views/auth/profile_view.dart';
+import 'package:chat/views/auth/profile/change_password_view.dart';
+import 'package:chat/views/auth/profile/profile_view.dart';
 import 'package:chat/views/auth/register_view.dart';
 import 'package:chat/views/splach_view.dart' show SplachView;
 import 'package:get/get.dart';
@@ -18,6 +19,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.forgotpassword,
       page: () => const ForgetPasswordView(),
+    ),
+      GetPage(
+      name: AppRoutes.changepassword,
+      page: () => const ChangePasswordView(),
     ),
 
     // GetPage(name: AppRoutes.home, page: () => const Homeview(),
