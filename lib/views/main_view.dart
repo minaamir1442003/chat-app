@@ -1,8 +1,10 @@
 import 'package:chat/controllers/main_controller.dart';
 import 'package:chat/themes/app_theme.dart';
 import 'package:chat/views/auth/profile/profile_view.dart';
+import 'package:chat/views/find_people_view.dart';
+import 'package:chat/views/home_view.dart';
+import 'package:chat/views/widget/friend_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 class MainView extends GetView<MainController> {
@@ -13,12 +15,9 @@ class MainView extends GetView<MainController> {
         controller: controller.pageController,
         onPageChanged: controller.onpagechanged,
         children: [
-          // homeview(),
-          // friendsview(),
-          // userslistview(),
-          Container(),
-          Container(),
-          Container(),
+          HomeView(),
+          FriendView(),
+          FindPeopleView(),
           ProfileView(),
         ],
       ),
