@@ -47,8 +47,8 @@ class _SplachViewState extends State<SplachView>
     await Future.delayed(const Duration(milliseconds: 300));
 
     if (authController.isauthenticated) {
-      // Get.offAllNamed(AppRoutes.main);
-      Get.offAllNamed(AppRoutes.profile);
+      Get.offAllNamed(AppRoutes.main);
+      // Get.offAllNamed(AppRoutes.profile);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

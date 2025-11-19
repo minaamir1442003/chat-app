@@ -55,52 +55,60 @@ class AuthController extends GetxController {
   //   _isinitialized.value = true;
   // }
 
-  Future<void> signinwithemailandpassword(String email, String password) async {
-    try {
-      _isloading.value = true;
-      _error.value = "";
-      UserModel? usrmodel = await _authServices.signinwithemailandpassword(
-        email,
-        password,
-      );
-      if (usrmodel != null) {
-        _userModel.value = usermodel;
-        Get.offAllNamed(AppRoutes.main);
-      }
-    } catch (e) {
-      _error.value = e.toString();
-      Get.snackbar("error", 'faild to login');
-      print(e);
-    } finally {
-      _isloading.value = false;
-    }
-  }
+Future<void> signinwithemailandpassword(String email, String password) async {
+  try {
+    _isloading.value = true;
+    _error.value = "";
+    UserModel? usrmodel = await _authServices.signinwithemailandpassword(
+      email,
+      password,
+    );
 
-  Future<void> registerwithemailandpassword(
-    String email,
-    String password,
-    String displayname,
-  ) async {
-    try {
-      _isloading.value = true;
-      _error.value = "";
-      UserModel? usrmodel = await _authServices.registerwithemailandpassword(
-        email,
-        password,
-        displayname,
-      );
-      if (usrmodel != null) {
-        _userModel.value = usermodel;
-        Get.offAllNamed(AppRoutes.main);
-      }
-    } catch (e) {
-      _error.value = e.toString();
-      Get.snackbar("error", 'faild to creat acount');
-      print(e);
-    } finally {
-      _isloading.value = false;
+    if (usrmodel != null) {
+      _userModel.value = usrmodel; // ✅ استخدم usrmodel مش usermodel
+      _user.value = FirebaseAuth.instance.currentUser; // ✅ لازم تحدث _user هنا
+      print('✅ Signed in user: ${_user.value?.uid}');
+      Get.offAllNamed(AppRoutes.main);
     }
+  } catch (e) {
+    _error.value = e.toString();
+    Get.snackbar("error", 'Failed to login');
+    print('❌ Login error: $e');
+  } finally {
+    _isloading.value = false;
   }
+}
+
+
+Future<void> registerwithemailandpassword(
+  String email,
+  String password,
+  String displayname,
+) async {
+  try {
+    _isloading.value = true;
+    _error.value = "";
+    UserModel? usrmodel = await _authServices.registerwithemailandpassword(
+      email,
+      password,
+      displayname,
+    );
+
+    if (usrmodel != null) {
+      _userModel.value = usrmodel; // ✅ التصحيح هنا
+      _user.value = FirebaseAuth.instance.currentUser; // ✅ تحديث المستخدم الحالي
+      print('✅ Registered user: ${_user.value?.uid}');
+      Get.offAllNamed(AppRoutes.main);
+    }
+  } catch (e) {
+    _error.value = e.toString();
+    Get.snackbar("error", 'Failed to create account');
+    print('❌ Register error: $e');
+  } finally {
+    _isloading.value = false;
+  }
+}
+
 
   Future<void> signout() async {
     try {

@@ -1,13 +1,24 @@
+import 'package:chat/controllers/friend_controller.dart';
+import 'package:chat/controllers/friend_request_controller.dart';
+import 'package:chat/controllers/home_controller.dart';
 import 'package:chat/controllers/main_controller.dart';
+import 'package:chat/controllers/notification_controller.dart';
 import 'package:chat/controllers/profile_conroller.dart';
+import 'package:chat/controllers/users_list_controller.dart';
 import 'package:chat/routes/app_routes.dart';
 import 'package:chat/views/auth/forget_password_view.dart';
 import 'package:chat/views/auth/login_view.dart';
 import 'package:chat/views/auth/profile/change_password_view.dart';
 import 'package:chat/views/auth/profile/profile_view.dart';
 import 'package:chat/views/auth/register_view.dart';
+import 'package:chat/views/find_people_view.dart';
+import 'package:chat/views/friend_request_view.dart';
+import 'package:chat/views/home_view.dart';
 import 'package:chat/views/main_view.dart';
+import 'package:chat/views/notification_view.dart';
 import 'package:chat/views/splach_view.dart' show SplachView;
+import 'package:chat/views/widget/friend_view.dart';
+import 'package:chat/views/widget/user_list_item.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -22,23 +33,25 @@ class AppPages {
       name: AppRoutes.forgotpassword,
       page: () => const ForgetPasswordView(),
     ),
-      GetPage(
+    GetPage(
       name: AppRoutes.changepassword,
       page: () => const ChangePasswordView(),
     ),
 
-    // GetPage(name: AppRoutes.home, page: () => const Homeview(),
-    //   bindings: BindingsBuilder(
-    //   () {
-    //     Get.put(homecontroller())
-    //   },
-    // )),
-    GetPage(name: AppRoutes.main, page: () =>  MainView(),
-      binding: BindingsBuilder(
-        () {
-          Get.put(MainController());
-        },
-      )),
+    GetPage(
+      name: AppRoutes.home,
+      page: () => HomeView(),
+      binding: BindingsBuilder(() {
+        Get.put(HomeController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.main,
+      page: () => MainView(),
+      binding: BindingsBuilder(() {
+        Get.put(MainController());
+      }),
+    ),
     // GetPage(name: AppRoutes.login, page: () => const Loginview()),
     // GetPage(name: AppRoutes.register, page: () => const Registerview()),
     // GetPage(name: AppRoutes.forgotpassword, page: () => const ForgotPasswordview()),
@@ -56,26 +69,33 @@ class AppPages {
     //     Get.put(chatcontroller())
     //   },
     // )),
-    // GetPage(name: AppRoutes.userlist, page: () => const UserListview(),
-    //   bindings: BindingsBuilder(
-    //   () {
-    //     Get.put(userlistcontroller())
-    //   },
-    // )),
-    // GetPage(name: AppRoutes.frinds, page: () => const Friendsview(),
-    //   bindings: BindingsBuilder(
-    //   () {
-    //     Get.put(frindcontroller())
-    //   },
-    // )),
-    // GetPage(name: AppRoutes.frindsreqire, page: () => const FriendsRequestview(
-
-    // ),
-    // bindings: BindingsBuilder(
-    //   () {
-    //     Get.put(frindreqirecontroll())
-    //   },
-    // )),
-    // GetPage(name: AppRoutes.notiication, page: () => const Notificationview()),
+    GetPage(
+      name: AppRoutes.userlist,
+      page: () => FindPeopleView(),
+      binding: BindingsBuilder(() {
+        Get.put(UsersListController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.frinds,
+      page: () => FriendView(),
+      binding: BindingsBuilder(() {
+        Get.put(FriendController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.frindsrequests,
+      page: () => FriendRequestView(),
+      binding: BindingsBuilder(() {
+        Get.put(FriendRequestController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.notiication,
+      page: () => NotificationView(),
+      binding: BindingsBuilder(() {
+        Get.put(NotificationController());
+      }),
+    ),
   ];
 }

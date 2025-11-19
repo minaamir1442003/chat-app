@@ -10,6 +10,6 @@ class AppRoutes {
   static const String chat = '/chat';
   static const String userlist = '/userlist';
   static const String frinds = '/frinds';
-  static const String frindsreqire = '/frindsreqire';
+  static const String frindsrequests = '/frindsrequests';
   static const String notiication = '/notiication';
 }

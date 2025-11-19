@@ -130,45 +130,59 @@ class FirestoreServices {
     FrindReqistState status,
   ) async {
     try {
+      // تحديث حالة طلب الصداقة
       await _firestore.collection('friendships').doc(requestid).update({
         'status': status.name,
         'respondedat': DateTime.now().millisecondsSinceEpoch,
       });
+
       DocumentSnapshot requestdoc =
           await _firestore.collection('friendships').doc(requestid).get();
+
       if (requestdoc.exists) {
         FrindReqistModel request = FrindReqistModel.fromMap(
           requestdoc.data() as Map<String, dynamic>,
         );
+
         if (status == FrindReqistState.accepted) {
+          print(
+            '✅ Creating REAL friendship between ${request.senderId} and ${request.receiverId}',
+          );
+
+          // ✅ إنشاء صداقة حقيقية (ليست مجرد طلب مقبول)
           await creatfriendship(request.senderId, request.receiverId);
+
           await creatnotification(
             NotificationModel(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               userId: request.senderId,
-              title: 'friend reqest Accepted',
-              body: 'your friend request has been accepted',
+              title: 'Friend Request Accepted',
+              body: 'Your friend request has been accepted',
               type: NotificationType.friendRequestAccepted,
               createdAt: DateTime.now(),
               data: {'userid': request.receiverId},
             ),
           );
+
           await _removenotificationforcancelledrequest(
             request.receiverId,
             request.senderId,
           );
+
+          print('🎉 Real friendship created successfully!');
         } else if (status == FrindReqistState.declined) {
           await creatnotification(
             NotificationModel(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               userId: request.senderId,
-              title: 'friend reqest declined',
-              body: 'your friend request has been declined',
-              type: NotificationType.friendRequestAccepted,
+              title: 'Friend Request Declined',
+              body: 'Your friend request has been declined',
+              type: NotificationType.friendRequestDeclined, // ✅ تصحيح النوع
               createdAt: DateTime.now(),
               data: {'userid': request.receiverId},
             ),
           );
+
           await _removenotificationforcancelledrequest(
             request.receiverId,
             request.senderId,
@@ -176,7 +190,8 @@ class FirestoreServices {
         }
       }
     } catch (e) {
-      throw Exception('failed to respond to friend request : ${e.toString()}');
+      print('❌ Error in respondtofriendrequest: $e');
+      throw Exception('Failed to respond to friend request: ${e.toString()}');
     }
   }
 
@@ -185,28 +200,32 @@ class FirestoreServices {
         .collection('friendships')
         .where('receiverId', isEqualTo: userid)
         .where('status', isEqualTo: 'pending')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
+        .snapshots() // إزالة orderBy لتجنب index
+        .map((snapshot) {
+          var requests =
               snapshot.docs
                   .map((doc) => FrindReqistModel.fromMap(doc.data()))
-                  .toList(),
-        );
+                  .toList();
+          // ترتيب محلي بدلاً من orderBy في query
+          requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return requests;
+        });
   }
 
   Stream<List<FrindReqistModel>> getsentfriendrequestsstream(String userid) {
     return _firestore
         .collection('friendships')
         .where('senderId', isEqualTo: userid)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
+        .snapshots() // إزالة orderBy
+        .map((snapshot) {
+          var requests =
               snapshot.docs
                   .map((doc) => FrindReqistModel.fromMap(doc.data()))
-                  .toList(),
-        );
+                  .toList();
+          // ترتيب محلي
+          requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return requests;
+        });
   }
 
   Future<FrindReqistModel?> getfriendrequest(
@@ -306,27 +325,77 @@ class FirestoreServices {
   Stream<List<FriendshipModel>> getfriendsstream(String userid) {
     return _firestore
         .collection('friendships')
-        .where('user1id', isEqualTo: userid)
+        .where('user1Id', isEqualTo: userid)
         .snapshots()
         .asyncMap((snapshot1) async {
           QuerySnapshot snapshot2 =
               await _firestore
                   .collection('friendships')
-                  .where('user2id', isEqualTo: userid)
+                  .where('user2Id', isEqualTo: userid)
                   .get();
 
-          List<FriendshipModel> friendship = [];
+          List<FriendshipModel> friendships = [];
+
+          // معالجة النتائج من الاستعلام الأول
           for (var doc in snapshot1.docs) {
-            friendship.add(
-              FriendshipModel.fromMap(doc.data() as Map<String, dynamic>),
-            );
+            try {
+              var data = doc.data() as Map<String, dynamic>;
+              // ✅ تخطي طلبات الصداقة
+              if (data.containsKey('senderId') ||
+                  data.containsKey('receiverId')) {
+                print('⏩ Skipping friend request: ${doc.id}');
+                continue;
+              }
+
+              var friendship = FriendshipModel.fromMap(data);
+
+              // ✅ تصفية الصداقات مع النفس
+              if (friendship.user1Id == friendship.user2Id) {
+                print('🚫 Skipping self-friendship: ${friendship.id}');
+                continue;
+              }
+
+              print('👥 Real friendship from user1Id: ${friendship.id}');
+              friendships.add(friendship);
+            } catch (e) {
+              print('❌ Error parsing friendship doc: $e');
+            }
           }
+
+          // معالجة النتائج من الاستعلام الثاني
           for (var doc in snapshot2.docs) {
-            friendship.add(
-              FriendshipModel.fromMap(doc.data() as Map<String, dynamic>),
-            );
+            try {
+              var data = doc.data() as Map<String, dynamic>;
+              // ✅ تخطي طلبات الصداقة
+              if (data.containsKey('senderId') ||
+                  data.containsKey('receiverId')) {
+                print('⏩ Skipping friend request: ${doc.id}');
+                continue;
+              }
+
+              var friendship = FriendshipModel.fromMap(data);
+
+              // ✅ تصفية الصداقات مع النفس
+              if (friendship.user1Id == friendship.user2Id) {
+                print('🚫 Skipping self-friendship: ${friendship.id}');
+                continue;
+              }
+
+              print('👥 Real friendship from user2Id: ${friendship.id}');
+              friendships.add(friendship);
+            } catch (e) {
+              print('❌ Error parsing friendship doc: $e');
+            }
           }
-          return friendship.where((f) => !f.isBlocked).toList();
+
+          // ✅ إزالة التكرارات (لأن نفس الصداقة قد تظهر في كلا الاستعلامين)
+          friendships = friendships.toSet().toList();
+
+          print('📊 Total real friendships found: ${friendships.length}');
+          final filtered = friendships.where((f) => !f.isBlocked).toList();
+          print('✅ Non-blocked real friendships: ${filtered.length}');
+
+          return filtered;
         });
   }
 
@@ -409,15 +478,17 @@ class FirestoreServices {
     return _firestore
         .collection('chats')
         .where('participants', arrayContains: userid)
-        .orderBy('updatedAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
+        .snapshots() // إزالة orderBy
+        .map((snapshot) {
+          var chats =
               snapshot.docs
                   .map((doc) => ChatModel.fromMap(doc.data()))
                   .where((chat) => !chat.isdeletedby(userid))
-                  .toList(),
-        );
+                  .toList();
+          // ترتيب محلي
+          chats.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+          return chats;
+        });
   }
 
   Future<void> updatechatlastmessage(
