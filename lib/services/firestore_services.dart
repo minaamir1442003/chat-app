@@ -767,4 +767,14 @@ class FirestoreServices {
       );
     }
   }
+  Future<bool> unfriendcheck(String user1, String user2) async {
+  final friendship = await getfriendships(user1, user2);
+
+  // مفيش أي علاقة
+  if (friendship == null) return true;
+
+  // لو الشخصين مش أصدقاء
+  return false;
+}
+
 }

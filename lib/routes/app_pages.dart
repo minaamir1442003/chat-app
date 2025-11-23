@@ -1,3 +1,4 @@
+import 'package:chat/controllers/chat_conroller.dart';
 import 'package:chat/controllers/friend_controller.dart';
 import 'package:chat/controllers/friend_request_controller.dart';
 import 'package:chat/controllers/home_controller.dart';
@@ -11,6 +12,7 @@ import 'package:chat/views/auth/login_view.dart';
 import 'package:chat/views/auth/profile/change_password_view.dart';
 import 'package:chat/views/auth/profile/profile_view.dart';
 import 'package:chat/views/auth/register_view.dart';
+import 'package:chat/views/chat_view.dart';
 import 'package:chat/views/find_people_view.dart';
 import 'package:chat/views/friend_request_view.dart';
 import 'package:chat/views/home_view.dart';
@@ -18,7 +20,6 @@ import 'package:chat/views/main_view.dart';
 import 'package:chat/views/notification_view.dart';
 import 'package:chat/views/splach_view.dart' show SplachView;
 import 'package:chat/views/widget/friend_view.dart';
-import 'package:chat/views/widget/user_list_item.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -63,12 +64,13 @@ class AppPages {
         Get.put(ProfileController());
       }),
     ),
-    // GetPage(name: AppRoutes.chat, page: () => const Chatview()
-    // ,  bindings: BindingsBuilder(
-    //   () {
-    //     Get.put(chatcontroller())
-    //   },
-    // )),
+    GetPage(
+      name: AppRoutes.chat,
+      page: () => const ChatView(),
+      binding: BindingsBuilder(() {
+        Get.put(ChatConroller());
+      }),
+    ),
     GetPage(
       name: AppRoutes.userlist,
       page: () => FindPeopleView(),
